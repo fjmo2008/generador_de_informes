@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <link rel="stylesheet" href="./lib/bootstrap.min.css">
+  <script src="./lib/jquery.min.js"></script>
+  <script src="./lib/popper.min.js"></script>
+  <script src="./lib/bootstrap.min.js"></script>
+
+  <script src="./lib/config.js"></script>
+
+  </head>
+  <body>
+
+<template id="template-centro">
+    <div style="height: 60px"></div>
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h4 class="card-title text-center">Seleccione el centro de trabajo</h4>
+            	<hr class="my-4">
+              	<div class="form-label-group col-sm-9 col-md-7 col-lg-5">
+			 		<select id="centro"></select>
+              	</div>
+            	<hr class="my-4">
+              	<button id="aceptarCentro" class="btn btn-lg btn-primary btn-block text-uppercase">Aceptar</button>
+           </div>
+        </div>
+    </div>
+</template>
+
+<template id="template-vista">
+    <div style="height: 70px"></div>
+    <div class="col-sm-9 col-md-7 col-lg-6 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h4 class="card-title text-center">Seleccione los informes a generar</h4>
+            	<hr class="my-4">
+              	<div class="form-label-group col-sm-9 col-md-7 col-lg-6">
+			 		<select id="vista"></select>
+              	</div>
+            	<hr class="my-4">
+              	<button id="aceptarVista" class="btn btn-lg btn-primary btn-block text-uppercase">Aceptar</button>
+           </div>
+        </div>
+    </div>
+</template>
+
+<template id="template-fechas">
+    <div style="height: 70px"></div>
+	<h4>Nombre de la vista</h4>
+
+    <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h4 class="card-title text-center">Especifique las fechas (max. 7 días)</h4>
+
+		    <div class="form-group row">
+			    <label for="fechad" class="col-sm-3 col-form-label">Desde</label>
+			    <div class="col-sm-5">
+				    <input type="text" class="form-control" id="fechad" placeholder="dd/mm/yyyy" size="10">
+			    </div>
+			</div>
+		  	<div class="form-group row">
+			    <label for="fechah" class="col-sm-3 col-form-label">Hasta</label>
+			    <div class="col-sm-5">
+			    	<input type="text" class="form-control" id="fechah" placeholder="dd/mm/yyyy" size="10">
+			    </div>
+			</div>
+
+
+              	<button id="aceptarFechas" class="btn btn-lg btn-primary btn-block text-uppercase">Aceptar</button>
+           </div>
+	      	<div id="mensaje" class="text-danger text-center"></div>
+        </div>
+    </div>
+ 	<div class="container h-100">
+ 		<div class="row h-100 justify-content-center align-items-center">
+ 			<div id="spinner" class="spinner-border " ></div>
+ 		</div>
+ 	</div>
+
+</template>
+
+<template id="template-informes">
+	  <h4>Informes</h4>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+	        <th scope="col">NUHSA</th>
+	        <th scope="col">Remite</th>
+	        <th scope="col">Servicio</th>
+	        <th scope="col">Apellido-1</th>
+	        <th scope="col">Apellido-2</th>
+	        <th scope="col">Nombre</th>
+	        <th scope="col">Estado</th>
+	        <th scope="col">Informe</th>
+	        <th scope="col">Fichero</th>
+          </tr>
+        </thead>
+        <tbody id="items"></tbody>
+      </table>
+</template>
+
+<template id="template-lista-informes">
+  <tr>
+    <th scope="row">NUHSA</th>
+    <td id="remite">Remite</td>
+    <td>Servicio</td>
+    <td>Apellido-1</td>
+    <td>Apellido-2</td>
+    <td>Nombre</td>
+    <td>Estado</td>
+    <td>Informe</td>
+    <td>Fichero</td>
+  </tr>
+</template>
+
+<template id="template-footer-informes">
+    <div style="height: 70px"></div>
+</template>
+
+<template id="template-cabecera">
+    <nav class="navbar navbar-expand-md navbar-dark bg-light fixed-top border" id="header">
+        <div class="col">
+            <a class="navbar-brand" href="#">
+                <img src="img/logo.png" alt="Logo" style="width:40px;">
+            </a>
+        </div>
+        <div class="col-6" id="centroyusuario">Centro y usuario</div>
+        <div class="collapse navbar-collapse col-5" id="navbarCollapse">
+            <div class="navbar-nav ml-auto col-5">
+                <button type="submit" class="btn btn-info" id="botonDescargar">Descargar</button>
+                <button type="submit" class="btn btn-primary" id="botonVolver">Volver</button>
+                <button type="submit" class="btn btn-danger" id="botonSalir">Salir</button>
+            </div>
+        </div>
+    </nav>
+
+</template>
+
+
+  <div class="container">
+    <div class="row">
+        <div class="col-sm-9 mx-auto">
+            <img class="img-responsive" src="img/banner.jpg">
+        </div>
+    </div>
+    <hr class="my-4">
+    <div class="row">
+        <div class="col-sm-9 mx-auto">
+	        <h2 style="text-align: center">Generador de Informes de Alta Automático</h1>
+    	</div>
+    </div>
+    <div class="row">
+
+      <div class="col-sm-9 col-md-7 col-lg-5 mx-auto">
+        <div class="card card-signin my-5">
+          <div class="card-body">
+            <h5 class="card-title text-center">Acceso</h5>
+              <div class="form-label-group">
+                <input type="text" id="user" class="form-control" placeholder="Usuario" required autofocus>
+                <label for="user"></label>
+              </div>
+
+              <div class="form-label-group">
+                <input type="password" id="pass" class="form-control" placeholder="Password" required>
+                <label for="pass"></label>
+              </div>
+
+              <button id="login" class="btn btn-lg btn-primary btn-block text-uppercase">Acceder</button>
+          </div>
+          <div id="error-login" class="card-body">
+  	            <h5 class="card-title text-center text-danger">Usuario/contraseña incorrectos</h5>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    <nav class="navbar navbar-expand-md navbar-dark bg-light fixed-bottom border" id="footer">
+        <p class="text-muted text-center">(C) 2020. Servicio de Informática (Fco. J. Mingorance). Centro San Rafael. Granada.</p>
+    </nav>
+
+
+
+
+
+
+
+
+
+
+
+
+	<script>
+
+        // ROUTER de eventos
+        const matchEvent = (ev, sel) => ev.target.matches(sel);
+        const myId = (ev) => Number(ev.target.dataset.myId);
+
+        // Variables globales
+        let gruposAD = [];				// Contiene la tabla GIS_CENTROS
+        let gruposUsuario = [];			// Los grupos en los que está incluido el usuario
+        let nombreUsuario = '';			// Contendrá el nombre completo del usuario
+        let centrosUsuario = [];		// Los centros para los que tiene permiso tras el login
+        let centroLogin = '';			// Centro elegido en el login
+        let idCentro = null;			// id el centro elegido en el login
+        let codCentro = '';				// Codigo del centro para SJD
+        let vistasCentros = [];			// Vistas disponibles para todos los centros
+        let vistasCentro = [];			// Vistas disponibles para el centro elegido
+        let vistaSelec = '';			// vista seleccionada
+        let vistaQuery = '';			// Query de la vista seleccionada que se ejecutará
+        let informes = [];				// Listado de los informes que se han generado y los que no
+        let fechaDesde = null;			// Fecha desde la que generar los informes
+        let fechaHasta = null;			// Fecha hasta la que generar los informes
+        let stringFecha = '';			// Fecha y hora en la ue se generan los informes
+
+        // accion cuando se pulsa el boton de login al introducir usuario y contraseña
+        document.getElementById("error-login").style.display = 'none'
+        document.addEventListener('click', ev => {
+            if      (matchEvent(ev, '#login'))  login  (document.getElementById('user').value,document.getElementById('pass').value);
+        })
+        
+        // FUNCIONES
+        // valida que el formato de la fecha sea dd/mm/yyyy y sea valido
+		const validarFecha = ( pfecha ) => {
+
+		    let ok = true;
+		   	let fecha = pfecha.split("/");    
+		   	if (fecha.length != 3) {
+		   		ok = false;
+		   		return ok;
+		   	}    
+		    let d = parseInt(fecha[0]);        
+		    let m = parseInt(fecha[1]);        
+		    let a = parseInt(fecha[2]);        
+
+		    if( (a < 1900) || (a > 2050) || (m < 1) || (m > 12) || (d < 1) || (d > 31) )
+		       ok = false;
+		    else
+		    {
+		       if((a%4 != 0) && (m == 2) && (d > 28))
+		          ok = false;
+		       else
+		       {
+		          if( (((m == 4) || (m == 6) || (m == 9) || (m==11)) && (d>30)) || ((m==2) && (d>29)) )
+		             ok = false;
+		       }
+		    }
+		    return ok;
+		}
+
+		// convierte a fecha
+		const valorFecha = (pfecha) => {
+		   	let fecha = pfecha.split("/");    
+		   	if (fecha.length != 3) {
+		   		ok = false;
+		   		return ok;
+		   	}    
+		    let d = fecha[0];        
+		    let m = fecha[1];        
+		    let a = fecha[2];  
+			return new Date(a+"-"+m+"-"+d);   
+
+		}
+
+        // MODELO DE DATOS
+        // Devuelve el resultado de comprobar si el usuario/pass es correcto en el AD
+		const getUser = async (user,pass) => {
+			var url = WS_VALIDA_USUARIO; // antes p4.php
+			let grp = [];
+			gruposAD.forEach(grupo => grp.push(grupo["GRUPO_AD"]));
+			var data = {usuario: user, clave: pass, ADgrupos: grp};
+
+			let response = await fetch(url, {
+			  method: 'POST',
+			  body: JSON.stringify(data), 
+			  headers:{
+			    'Content-Type': 'application/json'
+			  }
+			});
+		    return await response.json();
+		}
+
+        // Devuelve los grupos del AD configurados en la tabla GIS_CENTROS
+		const getGrupos = async () => {
+			var url = WS_GET_GRUPOS_AD;
+
+			let response = await fetch(url, {
+			  method: 'GET',
+			  headers:{
+			    'Content-Type': 'application/json'
+			  }
+			});
+		    return await response.json();
+		}
+
+        // Devuelve las vistas disponibles para el centro elegido
+		const getVistas = async () => {
+			var url = WS_GET_VISTAS_CENTRO;
+
+			let response = await fetch(url, {
+			  method: 'GET',
+			  headers:{
+			    'Content-Type': 'application/json'
+			  }
+			});
+		    return await response.json();
+		}
+
+		// Prepara los centros sobre los que el usuario tiene permiso para que elija con cual trabajar
+		const elegirCentro = (pcentros,pnombre) => {
+			const contBody = document.querySelector('body');
+			//contBody.innerHTML = ''
+
+			if(document.getElementById("header")){/* Que hacer si existe */
+			    document.getElementById('botonVolver').style.display = 'none'
+				document.getElementById('centroyusuario').textContent = nombreUsuario
+
+			} else {
+				/* Que hacer si no existe */
+				const cabecera = document.querySelector('#template-cabecera').content
+	    		const fragcabe = document.createDocumentFragment()
+
+				cabecera.getElementById('centroyusuario').textContent = nombreUsuario
+	        	const clonecabe = cabecera.cloneNode(true)
+	        	fragcabe.appendChild(clonecabe)
+			    contBody.appendChild(fragcabe)
+			    document.getElementById('botonVolver').style.display = 'none'
+			    document.getElementById('botonDescargar').style.display = 'none'
+			}
+
+
+
+	        const contenedor = document.querySelector('.container');
+
+			contenedor.innerHTML = ''
+			
+			let grupos = pcentros.slice();
+			nombreUsuario = pnombre;
+			centrosUsuario = [];
+			grupos.sort();
+			grupos.forEach(cargaCentros);
+    		const template = document.querySelector('#template-centro').content
+    		const fragment = document.createDocumentFragment()
+
+			//template.querySelector('h1').textContent = nombreUsuario
+
+
+        	var x = template.getElementById("centro")
+
+			// borramos todos los posibles valores que haya en el select
+        	for (i = x.length-1; i >= 0; i--) x.remove(i);
+
+			// Añadimos los centros al select
+			for (value in centrosUsuario) {
+			  var option = document.createElement("option");
+			  option.text = centrosUsuario[value];
+			  x.add(option);
+			}
+
+        	const clone = template.cloneNode(true)
+        	fragment.appendChild(clone)
+		    contenedor.appendChild(fragment)
+		    accionBotonesCentro();
+
+		}
+
+		// Prepara las vistas configuradas del centro seleccionado para elegir con cual trabajar
+		const elegirVistaCentro = () => {
+	        const contenedor = document.querySelector('.container');
+
+			contenedor.innerHTML = ''
+
+			vistasCentro = [];
+			vistasCentros.forEach(cargaVistas)
+
+    		const template = document.querySelector('#template-vista').content
+    		const fragment = document.createDocumentFragment()
+			//template.querySelector('h1').textContent = centroLogin
+			//template.querySelector('h2').textContent = nombreUsuario
+
+			document.getElementById('centroyusuario').textContent = nombreUsuario + ' / ' + centroLogin;
+
+        	var x = template.getElementById("vista")
+
+			// borramos todos los posibles valores que haya en el select
+        	for (i = x.length-1; i >= 0; i--) x.remove(i);
+
+			for (value in vistasCentro) {
+			  var option = document.createElement("option");
+			  option.text = vistasCentro[value];
+			  x.add(option);
+			}
+
+        	const clone = template.cloneNode(true)
+        	fragment.appendChild(clone)
+		    contenedor.appendChild(fragment)
+		    document.getElementById('botonVolver').style.display = 'block'
+		    accionBotonesVista();
+
+		}
+
+		// Prepara el formulario para elegir las fechas
+		const elegirFechas = () => {
+	        const contenedor = document.querySelector('.container');
+
+			contenedor.innerHTML = ''
+
+
+    		const template = document.querySelector('#template-fechas').content
+    		const fragment = document.createDocumentFragment()
+			//template.querySelector('h1').textContent = centroLogin
+			//template.querySelector('h2').textContent = nombreUsuario
+			template.querySelector('h4').textContent = vistaSelec
+			template.getElementById("spinner").style.display = 'none'
+			template.getElementById("mensaje").style.display = 'none'
+			//template.getElementById("descargarZip").style.display = 'none'
+        	const clone = template.cloneNode(true)
+        	fragment.appendChild(clone)
+		    contenedor.appendChild(fragment)
+		    accionBotonesFechas();
+
+		}
+
+		// Pinta el resultado de los informes generados
+		const pintaInformes = () => {
+	        const contenedor = document.querySelector('.container');
+			//contenedor.innerHTML = ''
+
+			// Informes Generados
+
+			// Cabecera de la tabla
+			const tabla_generados = document.querySelector('#template-informes').content
+			tabla_generados.querySelector('table').setAttribute("id", "tabla_generados")
+			tabla_generados.querySelector('tbody').setAttribute("id", "items")
+			tabla_generados.querySelector('h4').textContent = 'Informes Generados'
+			const fragment_generados = document.createDocumentFragment()
+        	const clone = tabla_generados.cloneNode(true)
+        	fragment_generados.appendChild(clone)
+			contenedor.appendChild(fragment_generados)
+
+			
+			// Body de la tabla
+			const items = document.getElementById('items')
+    		const template = document.querySelector('#template-lista-informes').content
+    		const fragment = document.createDocumentFragment()
+    		informes.forEach(item => {
+    			if (item.FICHERO != '') {
+					template.querySelector('th').textContent = item.NUHSA
+					template.querySelectorAll('td')[0].textContent = item.CENTRO_REMITE
+					template.querySelectorAll('td')[1].textContent = item.SERVICIO
+					template.querySelectorAll('td')[2].textContent = item.APELLIDO1
+					template.querySelectorAll('td')[3].textContent = item.APELLIDO2
+					template.querySelectorAll('td')[4].textContent = item.NOMBRE
+					template.querySelectorAll('td')[5].textContent = item.ESTADO
+					template.querySelectorAll('td')[6].textContent = item.INFORME
+					template.querySelectorAll('td')[7].textContent = item.FICHERO
+		        	const clone = template.cloneNode(true)
+		        	fragment.appendChild(clone)
+    			}
+    		})
+		    items.appendChild(fragment)
+
+
+			// Informes NO Generados
+
+			// Cabecera de la tabla
+			const tabla_no_generados = document.querySelector('#template-informes').content
+			tabla_no_generados.querySelector('table').setAttribute("id", "tabla_no_generados")
+			tabla_no_generados.querySelector('tbody').setAttribute("id", "items_no")
+			tabla_no_generados.querySelector('h4').textContent = 'Informes NO Generados'
+			const fragment_no_generados = document.createDocumentFragment()
+        	const clone_no = tabla_no_generados.cloneNode(true)
+        	fragment_no_generados.appendChild(clone_no)
+			contenedor.appendChild(fragment_no_generados)
+			
+			// Body de la tabla
+			const items_no = document.getElementById('items_no')
+    		const template_no = document.querySelector('#template-lista-informes').content
+    		const fragment_no = document.createDocumentFragment()
+    		informes.forEach(item => {
+    			if (!item.FICHERO != '') {
+					template_no.querySelector('th').textContent = item.NUHSA
+					template_no.querySelectorAll('td')[0].textContent = item.CENTRO_REMITE
+					template_no.querySelectorAll('td')[1].textContent = item.SERVICIO
+					template_no.querySelectorAll('td')[2].textContent = item.APELLIDO1
+					template_no.querySelectorAll('td')[3].textContent = item.APELLIDO2
+					template_no.querySelectorAll('td')[4].textContent = item.NOMBRE
+					template_no.querySelectorAll('td')[5].textContent = item.ESTADO
+					template_no.querySelectorAll('td')[6].textContent = item.INFORME
+					template_no.querySelectorAll('td')[7].textContent = item.FICHERO
+		        	const clone_no = template_no.cloneNode(true)
+		        	fragment_no.appendChild(clone_no)
+		        	//console.log('fragment_no ',fragment_no.querySelector('th').textContent)
+    			}
+    		})
+		    items_no.appendChild(fragment_no)
+
+		    // Final de las tablas de los informes
+			const tabla_footer = document.querySelector('#template-footer-informes').content
+			const fragment_footer = document.createDocumentFragment()
+        	const clone_footer = tabla_footer.cloneNode(true)
+        	fragment_footer.appendChild(clone_footer)
+			contenedor.appendChild(fragment_footer)
+
+
+
+
+
+		    //accionBotonesInformes();
+
+		}
+
+		// Especificamos el evento del boton aceptar en el select del centro y enrutamos al siguiente paso: elegir la vista del centro seleccionado
+		const accionBotonesCentro = () => {
+			const botonAceptar = document.getElementById("aceptarCentro")
+			const botonSalir = document.getElementById("botonSalir")
+			botonAceptar.addEventListener('click', () => {
+				centroLogin = document.getElementById("centro").value;
+				const indice = gruposAD.findIndex(grupo => grupo.DESCRIPCION === centroLogin);
+				idCentro = gruposAD[indice]["ID"]
+				codCentro = gruposAD[indice]["COD_CENTRO"]
+
+				elegirVistaCentro();
+			})
+			botonSalir.addEventListener('click', () => {
+				window.location.href = './';
+			})
+		}
+
+		// Especificamos el evento del boton aceptar en el select de la vista y enrutamos al siguiente paso: especificar fechas a generar para los informes
+		const accionBotonesVista = () => {
+			const botonAceptar = document.getElementById("aceptarVista")
+			const botonVolver = document.getElementById("botonVolver")
+
+			document.getElementById("botonDescargar").style.display = 'none';
+
+			botonAceptar.addEventListener('click', () => {
+				vistaSelec = document.getElementById("vista").value;
+				const indice = vistasCentros.findIndex(vista => vista.VISTA === vistaSelec);
+				vistaQuery = vistasCentros[indice]["QUERY"]
+
+				//console.log(vistaQuery)
+				elegirFechas();
+			})
+			botonVolver.addEventListener('click', () => {
+				elegirCentro(gruposUsuario, nombreUsuario);
+			})
+		}
+
+		const accionBotonesDescargaZip = () => {
+			const botonDescargaZip = document.getElementById("botonDescargar")
+			botonDescargaZip.addEventListener('click', () => {
+				const urlZip = "./zip/"+codCentro+"/"+codCentro+"_"+stringFecha+"_"+fechaDesde.replace(/-/g,'')+"_"+fechaHasta.replace(/-/g,'')+".zip";
+		        window.location.href = urlZip;
+
+				//console.log(vistaQuery)
+				//elegirFechas();
+			})
+		}
+
+		// Especificamos el evento del boton aceptar en las fechas y comprobamos que las fechas introducidas son correctas
+		// Si las fechas son correctas enrutamos al siguiente paso: generar los informes de la vista seleccionada
+		const accionBotonesFechas = () => {
+			const botonAceptar = document.getElementById("aceptarFechas")
+			const botonVolver = document.getElementById("botonVolver")
+
+			botonAceptar.addEventListener('click', () => {
+				document.getElementById("mensaje").style.display = 'none'
+				if ( validarFecha(document.getElementById("fechad").value) && validarFecha(document.getElementById("fechah").value) ){
+					if ( valorFecha(document.getElementById("fechad").value) <= valorFecha(document.getElementById("fechah").value) ) {
+						// saltamos al siguiente paso
+						nDias = (valorFecha(document.getElementById("fechah").value) - valorFecha(document.getElementById("fechad").value))/86400000;
+						console.log("Diferencia en dias: ",nDias);
+/*						
+// Comento esto para poder generar periodos superiores a 7 días: 24/08/2022
+						if ( nDias < 7) {
+							//console.log("Puedes generar los informes");
+							fechaDesde = document.getElementById("fechad").value;
+							fechaDesde = fechaDesde.replace(/\//g,'-');
+							fechaHasta = document.getElementById("fechah").value;
+							fechaHasta = fechaHasta.replace(/\//g,'-')
+							document.getElementById("spinner").style.display = 'block';
+							generaInformes();
+						} else {
+							//console.log("No puede ser más de 7 días");
+							document.getElementById("mensaje").innerHTML = "ERROR. No se permite un rango superior a 7 días"
+							document.getElementById("mensaje").style.display = 'block'
+						}
+*/
+// Luego habrá que volver a quitar este bloque
+							fechaDesde = document.getElementById("fechad").value;
+							fechaDesde = fechaDesde.replace(/\//g,'-');
+							fechaHasta = document.getElementById("fechah").value;
+							fechaHasta = fechaHasta.replace(/\//g,'-')
+							document.getElementById("spinner").style.display = 'block';
+							generaInformes();
+// fin del bloque a quitar							
+
+
+					} else {
+						document.getElementById("mensaje").innerHTML = "ERROR. Fecha de inicio > Fecha de fin"
+						document.getElementById("mensaje").style.display = 'block'
+					}
+				} else {
+					document.getElementById("mensaje").innerHTML = "Fechas incorrectas. Revise el formato de las fechas"
+					document.getElementById("mensaje").style.display = 'block'
+				}
+			})
+			botonVolver.addEventListener('click', () => {
+				elegirVistaCentro();
+			})
+		}
+
+		const accionBotonesInformes = () => {
+			const botonAceptar = document.getElementById("aceptarFechas")
+			const botonVolver = document.getElementById("volverVistas")
+			botonAceptar.addEventListener('click', () => {
+				if ( validarFecha(document.getElementById("fechad").value) && validarFecha(document.getElementById("fechah").value) ){
+					if ( valorFecha(document.getElementById("fechad").value) <= valorFecha(document.getElementById("fechah").value) ) {
+						// saltamos al siguiente paso
+						fechaDesde = document.getElementById("fechad").value;
+						fechaDesde = fechaDesde.replace(/\//g,'-');
+						fechaHasta = document.getElementById("fechah").value;
+						fechaHasta = fechaHasta.replace(/\//g,'-')
+						document.getElementById("spinner").style.display = 'block';
+						// tomar tiempo de inicio para calcular el tiempo tardado en generar los informes
+						generaInformes();
+					} else {
+						document.getElementById("mensaje").innerHTML = "La fecha de inicio no puede ser mayor que la fecha de fin"
+					}
+				} else {
+					document.getElementById("mensaje").innerHTML = "Fechas incorrectas. Revise el formato de las fechas"
+				}
+			})
+			botonVolver.addEventListener('click', () => {
+				elegirVistaCentro();
+			})
+		}
+
+		// Cargamos los nombres de los centros que el usuario tiene asignados por grupo en un array para mostarlos en el select
+		const cargaCentros = (element, index, array) => {
+			const indice = gruposAD.findIndex(grupo => grupo.GRUPO_AD === element);
+			centrosUsuario.push(gruposAD[indice]["DESCRIPCION"])
+		}
+
+		// Cargamos los nombres de las vistas del centro seleccionado en un array para mostrarlas en el select
+		const cargaVistas = (element, index, array) => {
+			if (vistasCentros[index]["ID_CENTRO"] === idCentro) {
+				vistasCentro.push(vistasCentros[index]["VISTA"])
+			}
+		}
+
+		const getInformes = async() => {
+			var url = WS_GENERA_INFORMES_CON_FORMATO;
+			var fechaActual = new Date();
+			var fAno = fechaActual.getFullYear();
+			var fMes = fechaActual.getMonth()+1;
+			var fDia = (fechaActual.getDate()<10?'0':'') +fechaActual.getDate();
+			var fHora = (fechaActual.getHours()<10?'0':'') + fechaActual.getHours();
+			var fMinutos = (fechaActual.getMinutes()<10?'0':'') + fechaActual.getMinutes();
+			var fSegundos = (fechaActual.getSeconds()<10?'0':'') + fechaActual.getSeconds();
+			stringFecha = fAno+''+fMes+''+fDia+''+fHora+''+fMinutos+''+fSegundos;
+			var data = {fechad: fechaDesde, fechah: fechaHasta, vista: vistaQuery, codigo_centro: codCentro, fecha_generada: stringFecha};
+			// console.log(data);
+			/*
+			// se le añade esto despues de headers
+			  ,
+			  mode: 'no-cors'
+			*/
+			let response = await fetch(url, {
+			  method: 'POST',
+			  body: JSON.stringify(data), 
+			  headers:{
+			    'Content-Type': 'application/json'
+			  }
+			});
+		    return await response.json();
+		}
+
+
+		const pintarDescargaZip = () => {
+			document.getElementById("botonDescargar").style.display = 'block'
+		    accionBotonesDescargaZip()
+		}
+
+
+		// Generar informes con los datos seleccionados
+		const generaInformes = async () => {
+			var horaInicio = new Date();
+			console.log("Inicio:",horaInicio);
+			acceso = await getInformes();
+			informes = acceso.slice();
+			pintaInformes();
+			pintarDescargaZip();
+			var horaFinal = new Date();
+			console.log("Fin:",horaFinal);
+			document.getElementById("spinner").style.display = 'none';
+		}
+
+		// Accion cuando se pulsa el boton de login
+		// Llama a la funcion getUser que comprueba los datos en el AD y comprueba si el resultado es  
+		// True o False y un mensaje
+		const login = async (user,pass) =>{
+			acceso = await getUser(user,pass);
+			if (acceso.resultado) {
+				gruposUsuario = acceso.grupos_usuario.slice();
+				nombreUsuario = acceso.nombre_usuario;
+				elegirCentro(gruposUsuario, nombreUsuario);
+			} else {
+				//console.log(acceso.mensaje);
+		        document.getElementById("error-login").style.display = 'block'
+			};
+		}
+
+		// Carga inicial de los grupos de AD que están en la tabla GIS_CENTROS
+		const cargaGrupos = async () =>{
+			acceso = await getGrupos();
+			gruposAD = acceso.slice();
+		}
+
+		// Carga inicial de las vistas de todos los centros
+		const cargaVistasCentros = async () => {
+			acceso = await getVistas();
+			vistasCentros = acceso.slice();
+		}
+
+		// Cargamos los grupos del AD para tenermos cargados en un array
+        cargaGrupos();
+        // Cargamos todas las vistas y los centros para tenerlos cargados en un array
+        cargaVistasCentros();
+
+
+</script>
+
+
+  </body>
+</html>

@@ -1,0 +1,11 @@
+// url del web service para validar el usuario y la contraseña en el AD
+const WS_VALIDA_USUARIO = 'http://...';
+
+// url del webservice que carga los grupos/centros del AD a los que pertenece el usuario que ha hecho login
+const WS_GET_GRUPOS_AD = 'http://...';
+
+// url del webservice que carga las vistas que estan definidas para ese centro
+const WS_GET_VISTAS_CENTRO = 'http://...';
+
+// url del webservice a llamar para que genere los informes en PDF de cada paciente
+const WS_GENERA_INFORMES_CON_FORMATO = 'http://...';
